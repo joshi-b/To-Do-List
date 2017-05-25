@@ -8,6 +8,7 @@ class Todo(Frame):
         root.configure(bg='white')
 
         self.ment = StringVar()
+        self.itemlist = []
 
         self.buttonframe = Frame(root,bg='white')
         self.buttonframe.grid(columnspan=3, padx=20, pady=10)
@@ -27,37 +28,58 @@ class Todo(Frame):
         
         self.add_item = Button(self.buttonframe, text='Add')
         self.del_item = Button(self.buttonframe, text='Delete')
+        self.edit_item = Button(self.buttonframe, text='Edit')
         self.clear_button = Button(self.buttonframe, text='Clear All')
 
         self.add_item.bind('<Button-1>', self.add_button)
         self.del_item.bind('<Button-1>', self.del_button)
+        self.edit_item.bind('<Button-1>', self.edit_button)
         self.clear_button.bind('<Button-1>', self.clear_all)
 
         self.add_item.grid(row=1, ipadx=10)
         self.del_item.grid(row=1, column=1,ipadx=10)
-        self.clear_button.grid(row=1, column=2, ipadx=10)
+        self.edit_item.grid(row=1, column=2, ipadx=10)
+        self.clear_button.grid(row=2, columnspan=3, ipadx=57)
 
-        self.label_name.grid(row=2,sticky=E)
-        self.item_name.grid(row=2, column=1)
-        self.listbox.grid(row=3, padx=15, pady=5)
-        self.scrollbar.grid(row=3, sticky=N+S+E)
+        self.label_name.grid(row=3,sticky=E)
+        self.item_name.grid(row=3, column=1)
+        self.listbox.grid(row=4, padx=15, pady=5)
+        self.scrollbar.grid(row=4, sticky=N+S+E)
 
-        bottombar = Label(root, text='JoshiB  -  2017',bd=1)
+        bottombar = Label(root, text='joshi-b  -  2017',bd=1)
         bottombar.grid(row=11, columnspan=5, sticky=E+W)
         return    
     
     def add_button(self, event):
         tasktext = self.ment.get()
+        if tasktext == "":
+            return
         self.listbox.insert(END, tasktext)
+        self.itemlist.append(tasktext)
+        
+        self.item_name.delete(0, 'end')
         return
 
     def del_button(self, event):
-        item = self.listbox.curselection()
-        self.listbox.delete(item)
+        item_num = self.listbox.curselection()
+        self.listbox.delete(item_num)
+        self.itemlist.remove(self.itemlist[item_num])
+        return
+
+    def edit_button(self, event):
+        self.item_name.delete(0, 'end')
+        
+        item_num_t = self.listbox.curselection()
+        self.listbox.delete(item_num_t)
+        
+        item_num = item_num_t[0]
+        item = self.itemlist[item_num]
+        self.item_name.insert(0, item)
         return
 
     def clear_all(self, event):
         self.listbox.delete(0, END)
+        self.itemlist = []
         return
     
 if __name__ == '__main__':
