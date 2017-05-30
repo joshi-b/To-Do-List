@@ -1,4 +1,5 @@
 from tkinter import *
+import os.path
 
 class Todo(Frame):
         
@@ -48,25 +49,66 @@ class Todo(Frame):
 
         bottombar = Label(root, text='joshi-b  -  2017',bd=1)
         bottombar.grid(row=11, columnspan=5, sticky=E+W)
-        return    
+
+        if os.path.exists('to-do-items.txt'):
+            self.load_data()
+        else:
+            self.file.open('to-do-items.txt', 'w')
+
+        self.file.close()
+        return
+
+    def load_data(self):
+        self.file = open('to-do-items.txt', 'r')
+        self.file.seek(0)
+
+        line = self.file.readline()
+        while line != "":
+            self.itemlist.append(line)
+            line = self.file.readline()
+        self.file.close()
+
+        for x in self.itemlist:
+            self.listbox.insert(END, x)
+        return
     
     def add_button(self, event):
+        self.file = open('to-do-items.txt', 'a')
         tasktext = self.ment.get()
+    
         if tasktext == "":
             return
+        
         self.listbox.insert(END, tasktext)
         self.itemlist.append(tasktext)
-        
+        self.file.write(str(tasktext) + '\n')
+    
         self.item_name.delete(0, 'end')
+
+        self.file.close()
         return
 
     def del_button(self, event):
+        self.file = open('to-do-items.txt', 'w+')
+        
         item_num = self.listbox.curselection()
         self.listbox.delete(item_num)
-        self.itemlist.remove(self.itemlist[item_num])
-        return
+        item_num = item_num[0]
 
+        tasktext = self.itemlist[item_num]
+        self.itemlist.remove(tasktext)
+        
+        self.file.truncate()
+
+        for x in self.itemlist:
+            self.file.write(x)
+        
+        self.file.close()
+        return
+    
     def edit_button(self, event):
+        self.file = open('to-do-items.txt', 'w')
+        
         self.item_name.delete(0, 'end')
         
         item_num_t = self.listbox.curselection()
@@ -74,12 +116,24 @@ class Todo(Frame):
         
         item_num = item_num_t[0]
         item = self.itemlist[item_num]
+
+        self.itemlist.remove(self.itemlist[item_num])
+        
         self.item_name.insert(0, item)
+
+        for x in self.itemlist:
+            self.file.write(x)
+
+        self.file.close()
         return
 
     def clear_all(self, event):
+        self.file = open('to-do-items.txt', 'w')
         self.listbox.delete(0, END)
         self.itemlist = []
+
+        self.file.truncate()
+        self.file.close()
         return
     
 if __name__ == '__main__':
